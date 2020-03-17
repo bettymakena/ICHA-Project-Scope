@@ -13,6 +13,13 @@
     <script src="data/betty_edits1.geojson"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+    <!-- <script src="/js/leaflet.ajax.min.js"></script> -->
+    <script src="js/leaflet-providers.js"></script>
+    <script src="js/leaflet.ajax.min.js"></script>
+    <script src="data/betty_edits1.geojson"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         #mapid {
             height: 100vh;
@@ -30,43 +37,49 @@
             color: #777;
             }
     </style>
-    <title>ICHA Research and Learning | Welcome </title>
+    <title>Projects</title>
 </head>
 <body>
-    <h1>ICHA Project Scope
-         <link rel="icon" type="image/png" sizes="192x192"  href="ICHA Logo.png">
-    </h1>
-    
-    <div id="mapid"></div>
-    <script>
-        var bettymap = L.map('mapid').setView([0.0236, 37.9062], 6.5)
+  <h1>ICHA project scope</h1>
+  <div id="mapid"></div>
+  <script type="text/javascript">
+     var bettymap = L.map('mapid').setView([0.0236, 37.9062], 6)
         // load tiles later
         L.tileLayer.provider('OpenStreetMap.Mapnik').addTo(bettymap);
-        // var marker = L.marker([0.0236, 37.9062]).addTo(bettymap);
+        var marker = L.marker([0.0236, 37.9062]).addTo(bettymap);
 
          // styling the data
          var betty_style = {
             "color": "#ff7800",
             "weight": 1,
+  
             "opacity": 0.65
         };
 
-        function getColor(project){
-            return project == 'IARP' ? '#66c2a5':
-            project === 'AGYW and IARP' ? 'orange':
-            project === 'ForPAC and IARP' ? 'yellow':
-            project === 'KADP and IARP' ? 'green':
-            project === 'OFDA and IARP' ? '#fc8d62':
-            project === 'StERC and IARP' ? 'indigo':
-            project === 'WISER and IARP' ? 'violet':
-            project === 'WISER, KADP and IARP' ? 'white':
-            project === 'WISER, StERC and IARP' ? '#8da0cb':
-                                '#FFED0';
-        }
+      function getColor(feature){
+            if (feature = 'IARP'){
+                return '#66c2a5';
+            }else if (feature = 'OFDA'){
+                return 'orange';
+            }else if (feature = 'WISER') {
+                return 'yellow';
+            }else if (feature = 'StERC' ) {
+                return 'green';
+            } else if (feature = 'KADP') {
+                return '#fc8d62';
+            }else if (feature = 'ForPAC') {
+                return 'indigo';
+            } else{
+                return 'violet';
+            }
 
-        function style(feature){
+          }
+
+       function style(feature){
             return{
-                fillColor: getColor(feature.properties.PROJECTS),
+                // the style function takes feature as a parameter
+
+                fillColor: getColor(feature.properties),
                 weight: 1,
                 color: 'white',
                 dashArray: '3', 
@@ -74,103 +87,16 @@
             };
         }
 
-        function highlightFeature(e) {
-            var layer = e.target;
+        <div id = "Legend">
+             <h4 class = "test-center">ICHA Project Scope </h4>
+             <svg>
+             
+             </svg>
+        
 
-            layer.setStyle({
-                weight: 5,
-                color: '#666',
-                dashArray: '',
-                fillOpacity: 0.7
-            });
-
-            if(!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-                layer.bringToFront();
-            }
-
-            info.update(layer.feature.properties);
-        }
-
-        var geojson;
-
-        function resetHighlight(e) {
-            geojson.resetStyle(e.target);
-            info.update();
-        }
-
-        function zoomToFeature(e) {
-            bettymap.fitBounds(e.target.getBounds());
-        }
-
-        function onEachFeature(feature, layer) {
-            layer.on({
-                mouseover: highlightFeature,
-                mouseout: resetHighlight,
-                click: zoomToFeature
-            });
-        }
-
-        // custom control
-        var info = L.control();
-        info.onAdd = function (bettymap) {
-            this._div = L.DomUtil.create('div', 'info');
-            this.update();
-            return this._div;
-        };
-
-        info.update = function (props) {
-            this._div.innerHTML = '<h4>County Projects</h4>' +  (props ?
-            '<b>' + props.COUNTY + '</b><br />' + props.PROJECTS + ' project'
-            : 'Hover over a county');
-        };
-        info.addTo(bettymap);
-
-        // legend
-        var legend = L.control({position: 'bottomright'});
-
-        legend.onAdd = function (bettymap) {
-            var div = L.DomUtil.create('div', 'info legend');
-            labels = [],
-            projects = ['IARP',
-            'AGYW and IARP',
-            'ForPAC and IARP',
-            'KADP and IARP',
-            'OFDA and IARP',
-            'StERC and IARP',
-            'WISER and IARP',
-            'WISER, KADP and IARP',
-            'WISER, StERC and IARP'];
-
-            for (var i = 0; i < projects.length; i++) {
-                // from = projects[i];
-                // to = projects[i+1]
-
-                // labels.push
-                div.innerHTML += 
-                '<i style="background:' + getColor(projects[i] + 1) + '"></i> ' +
-                projects[i] + (projects[i + 1] ? '&ndash;' + projects[i + 1] + '<br>' : '+');
-            }
-            
-            return div;
-        }
-
-        legend.addTo(bettymap);
-
-
-        // loading GeoJSON file - Here my html and usa_adm.geojson file resides in same folder
-        // $.getJSON("data/betty_edits.geojson",function(data){
-            // L.geoJson function is used to parse geojson file and load on to map
-            // L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(bettymap);
-            // });
-
-
-        // loading geojson data
-        // var betty_layer = new L.GeoJSON.AJAX("data/betty_edits.geojson");
-        // L.geoJson(betty_layer).addTo(bettymap);
-        // betty_layer.addTo(bettymap, {style: betty_style}); 
-        geojson = L.geoJson(data1, { style: style, onEachFeature: onEachFeature}).addTo(bettymap);
-
-       
-    </script>
+              
+      geojson = L.geoJson(data1, {style:style}).addTo(bettymap);
+  </script>
 </body>
+
 </html>
